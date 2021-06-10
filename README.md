@@ -15,7 +15,7 @@ The above creates a local working container, which will not save outputs to file
 **//TODO :check the following works**, (Reference these [docs](https://docs.docker.com/storage/) )
 
 
-# Set up environment to read/write from host filesystem (required to make changes to training data and Jupyter notebook)
+## Set up environment to read/write from host filesystem (required to make changes to training data and Jupyter notebook)
 
 - To mount a folder into the docker container, i.e. r/w from it you must use: `docker run -v /Users/<path>:/<container path>`
 - See also [Stack Overflow question](https://stackoverflow.com/questions/31448821/how-to-write-data-to-host-file-system-from-docker-container) and ["Use volume docs"](https://docs.docker.com/storage/volumes/)
