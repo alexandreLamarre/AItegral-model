@@ -5,7 +5,7 @@ Repository for all code related to training a model that computes symbolic integ
 
 - Install docker on your CLI/host machine
 - Check docker is installed by running `docker`
-- Run `docker build -t <tag-name>`, to build the docker image
+- Run `docker build -t <tag-name> .`, to build the docker image
 - Then run `docker run -it --rm --name <container-name> <tag-name>`
 
 Note: `<tag-name>` and `<container-name>` can be anything you want, as they are local names.
