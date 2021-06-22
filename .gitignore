@@ -33,3 +33,8 @@ inc/
 /MANIFEST.bak
 /pm_to_blib
 /*.zip
+
+#temp outputs from methods
+*.out
+*.txt
+*.json
