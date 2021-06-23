@@ -86,12 +86,40 @@ sub getNesting{
         - No two consecutive variable/constants
         - No alphabetical strings that don't match builtin functions
         - 
-    @returns <bool> : True if formula is valid OR False is formula is invalid
+    @returns <bool> : True if formula is valid OR False if formula is invalid
 =cut
 sub isValid{
     my ($self) = @_;
     #TODO: IMPLEMENT using symbolic operator stacks
     return 0;
+}
+
+sub _getVarsRegex{
+    my ($self) = @_;
+    my $variables = $self->getVars();
+    my $regGroup = "(";
+    for(my $i = 0; $i < length($variables); $i++){
+        if($regGroup ne "("){
+            $regGroup.= "|"; 
+        }
+        $regGroup.= substr($variables, $i, 1);
+    }
+    $regGroup .= ")";
+    return $regGroup;
+}
+
+sub _getConstsRegex{
+    my ($self) = @_;
+    my $consts = $self->getConsts();
+    my $regGroup = "(";
+    for(my $i = 0; $i < length($consts); $i++){
+        if($regGroup ne "("){
+            $regGroup.="|";
+        }
+        $regGroup .= substr($consts, $i, 1);
+    }
+    $regGroup .= ")";
+    return $regGroup;
 }
 
 
