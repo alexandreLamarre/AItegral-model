@@ -91,7 +91,76 @@ sub getNesting{
 sub isValid{
     my ($self) = @_;
     #TODO: IMPLEMENT using symbolic operator stacks
-    return 0;
+    my $stackIndex = 0;
+    my $curFormula = $self->getData();
+
+
+    my @stack = ();
+    # my $temp = $curFormula =~ "(.*)\("; # extract anything before parentheses 
+    # if(length($temp) eq length($curFormula)){ #there are no parentheses so formula has nesting 1
+    #     return _isValidSubformula($curFormula);
+    # }
+    my $temp = "";
+    if($curFormula =~ /(.*)\(/){
+        my $temp = $1;
+    } else{ #only one level of nesting
+        return _isValidSubformula($curFormula);
+    }
+
+    push (@stack, $temp);
+    $stackIndex ++; #use to track the current stack index
+    # now we have one open parantheses.
+    $curFormula = substr($curFormula, length($temp));
+
+    while($curFormula ne ""){
+        my $newOpen = "";
+        my $newClose = "";
+        #check next parenthesis type
+        if($curFormula =~ /(.*)\(/){
+            $newOpen = $1;
+        } 
+        if($curFormula =~ /(.*)\)/){
+            $newClose = $1;
+        }
+
+        if(length($newOpen) < length($newClose)){#new open parentheses
+            $temp = $newOpen;
+            if($stackIndex == $#stack){ # new nesting
+                push(@stack, $temp);
+            } else{ #append to existing nesting level
+                $stack[$stackIndex - 1] .= "\|" . $temp;
+            }
+            $stackIndex ++;
+        } else{ #new closed parentheses
+            $temp = $newClose;
+            if($stackIndex <= 0){
+                print "Mismatched parentheses : not enough open parentheses\n";
+                return 0;
+            }
+
+            @stack[$stackIndex -1] .= "\|" . $temp; 
+            $stackIndex --;
+        }       
+        #trim formula with previously matched string
+        $curFormula = substr($curFormula , length($temp));
+    }
+
+    if($stackIndex){
+        print "Mismatched parentheses : not enough closed parentheses \n";
+        return 0;
+    }
+}
+
+=head1 isValidSubFormula
+    subFormulas cannot have 
+    - two adjacent operators of the same type :
+        `++` is invalid and so is `//` but `*+` or `*-` is valid
+    - two adjacent variables/constants/elemetary functions:
+        `logsin is invalid`, `aa` where a is a variable is invalid,
+        `ac` where a is a variable and c is a constant is invalid. 
+=cut 
+sub _isValidSubformula{
+    return 1;
 }
 
 sub _getVarsRegex{
