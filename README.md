@@ -13,4 +13,4 @@ Note: `<tag-name>` and `<container-name>` can be anything you want, as they are 
 The above creates a local working container, which will not save outputs to files you run the perl modules / jupyter notebook on your host machine. It should only be used as a data querying container for the upcoming Node.js data vis/debug server.
 
 # Data Pipeline Design
-<img src = "https://github.com/alexandreLamarre/AItegral-model/blob/main/data/DataPipeline.pdf" />
+![](data/DataPipeline.png)
