@@ -3,6 +3,9 @@ from sympy import *
 import random
 import math
 import re
+import json
+
+from sympy.core import symbol
 
 def generateFormula(maxNesting = 9, 
                     maxFuncs = 13, 
@@ -57,7 +60,7 @@ def generateFormula(maxNesting = 9,
         if(forms[i] and forms[i][-1] in ops):
             forms[i] = forms[i][:-1]
 
-    return forms#[*re.finditer("\_\_VAR[0-9]+\_\_", form)]
+    return forms, actualNesting, actualFuncs#[*re.finditer("\_\_VAR[0-9]+\_\_", form)]
 
 
 def getPlaceHolderVar(i):
@@ -93,25 +96,51 @@ def trimNestedForms(formsArr):
 
     return formsArr[:index]
 if __name__ == "__main__":
-    form = generateFormula()
-    form = trimNestedForms(form)
-    for i in range(len(form)):
-        print(form[i])
-    print("================")
-    for i in range(len(form) -1, 0, -1):
-        print("inserting", form[i])
-        print("into : ", form[i-1])
-        toReplace = '__NEST'+str(i)+'__'
-        print(toReplace)
-        form[i-1] = form[i-1].replace(toReplace, form[i])
-    
-    print("post processed formula:", form[0])
-    form = form[0]
-    matches = [*re.finditer("(\_\_VAR[0-9]+\_\_)|(\_\_NEST[0-9]+\_\_)", form)]
-    
-    form = replacePlaceholderVars(form, matches)
-    print("post-post processed formula", form)
+    dataPoints = 1000
+    symbolInput = 'x y'
+    x,y = symbols(symbolInput)
+    symbolArr = [x,y]
+    jsonRes = dict()
+    jsonRes['metadata'] = {'maxNesting' : 9, 
+                    'symbols' : symbolInput.split(),
+                    'maxFuncs' : 13, 
+                    'maxFormulaSize' : 25, 
+                    'negativeThreshold' : 0.9, 
+                    'funcsThreshold' : 0.5,
+                    'dataPointsGenerated' : 1000,
+                    'vars' : ["x", "y"]}
+    jsonRes['data'] = []
+    print("Generating integral data...")
+    for i in range(dataPoints):
 
-    x,y = symbols('x y')
-    derivative = diff(form, y)
-    print(derivative)
+        form,numNesting, numFuncs = generateFormula()
+        form = trimNestedForms(form)
+
+        #     print(form[i])
+        # print("================")
+        for i in range(len(form) -1, 0, -1):
+            # print("inserting", form[i])
+            # print("into : ", form[i-1])
+            toReplace = '__NEST'+str(i)+'__'
+            # print(toReplace)
+            form[i-1] = form[i-1].replace(toReplace, form[i])
+        
+        # print("post processed formula:", form[0])
+        form = form[0]
+        matches = [*re.finditer("(\_\_VAR[0-9]+\_\_)|(\_\_NEST[0-9]+\_\_)", form)]
+        
+        form = replacePlaceholderVars(form, matches)
+        # print("post-post processed formula", form)
+        integrationVar = symbolArr[math.floor(len(symbolArr) * random.random())]
+        derivative = diff(form, integrationVar)
+        # print(derivative)
+        newData = {'input' : str(derivative), 'output' : form, 
+        'nesting' : numNesting, 'functions': numFuncs,
+        'integrationVariable' : str(integrationVar)}
+        jsonRes['data'].append(newData)
+
+    print('...done!')
+    with open("./sample.json", "w") as outfile:
+        print("writing to json file...")
+        json.dump(jsonRes, outfile, indent=4)
+    print('...done!')
